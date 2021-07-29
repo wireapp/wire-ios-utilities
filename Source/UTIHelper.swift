@@ -23,6 +23,20 @@ import CoreServices
 
 @objc
 public final class UTIHelper: NSObject {
+
+    @objc
+    public class func conformsToImageType(uti: String) -> Bool {
+        if #available(iOS 14, *) {
+            guard let utType = UniformTypeIdentifiers.UTType(uti) else {
+                return false
+            }
+
+            return utType.conforms(to: UniformTypeIdentifiers.UTType.image) ////TODO: jpeg return false here
+        } else {
+            guard let mimeType = convertToMime(uti: uti) else { return false }
+            return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
+        }
+    }
     
     @objc
     public class func conformsToVectorType(uti: String) -> Bool {
