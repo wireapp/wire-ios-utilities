@@ -45,6 +45,8 @@ public final class UTIHelper: NSObject {
                     mimeType = "image/png"
                 case .gif:
                     mimeType = "image/gif"
+                case .json:
+                    mimeType = "application/json"
                 default:
                     return nil
                 }
