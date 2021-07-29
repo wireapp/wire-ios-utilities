@@ -31,7 +31,7 @@ public final class UTIHelper: NSObject {
                 return false
             }
 
-            return utType.conforms(to: UniformTypeIdentifiers.UTType.image) ////TODO: jpeg return false here
+            return utType.conforms(to: UniformTypeIdentifiers.UTType.image) || utType.conforms(to: UniformTypeIdentifiers.UTType.jpeg)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
             return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
