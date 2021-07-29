@@ -25,6 +25,20 @@ import CoreServices
 public final class UTIHelper: NSObject {
     
     @objc
+    public class func conformsToVectorType(mimeType: String) -> Bool {
+        if #available(iOS 14, *) {
+            guard let utType = UniformTypeIdentifiers.UTType(mimeType: mimeType) else {
+                return false
+            }
+
+            return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
+        } else {
+            return UTTypeConformsTo(mimeType as CFString, kUTTypeScalableVectorGraphics)
+        }
+    }
+
+    
+    @objc
     public class func convertToMime(uti: String) -> String? {
         
         let mimeType: String
