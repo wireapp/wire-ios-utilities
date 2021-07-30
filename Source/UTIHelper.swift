@@ -16,21 +16,20 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-
 import Foundation
 import UniformTypeIdentifiers
 import CoreServices
 
 @objc
 public final class UTIHelper: NSObject {
-    
+
     @objc
     public class func conformsToImageType(uti: String) -> Bool {
         if #available(iOS 14, *) {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-            
+
             return utType.conforms(to: .image) ||
                     utType.conforms(to: .png) ||
                     utType.conforms(to: .jpeg) ||
@@ -40,14 +39,14 @@ public final class UTIHelper: NSObject {
             return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
         }
     }
-    
+
     @objc
     public class func conformsToVectorType(uti: String) -> Bool {
         if #available(iOS 14, *) {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-                        
+
             return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
@@ -61,7 +60,7 @@ public final class UTIHelper: NSObject {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-                        
+
             return utType.conforms(to: UniformTypeIdentifiers.UTType.json)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
@@ -74,9 +73,9 @@ public final class UTIHelper: NSObject {
         if #available(iOS 14, *) {
             var utType: UniformTypeIdentifiers.UTType?
             utType = UniformTypeIdentifiers.UTType(mimeType: mime)
-            
+
             #if targetEnvironment(simulator)
-            ///HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+            /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
                 switch mime {
                 case "image/jpeg":
@@ -96,25 +95,25 @@ public final class UTIHelper: NSObject {
             return utType?.identifier
         } else {
             let cfString = UTTypeCreatePreferredIdentifierForTag(mime as CFString, kUTTagClassMIMEType as CFString, nil)?.takeRetainedValue()
-            
+
             return cfString as String?
         }
     }
-    
+
     @objc
     public class func convertToMime(uti: String) -> String? {
-        
+
         let mimeType: String
         if #available(iOS 14, *) {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return nil
             }
-            
+
             if let preferredMIMEType = utType.preferredMIMEType {
                 mimeType = preferredMIMEType
             } else {
                 #if targetEnvironment(simulator)
-                ///HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+                /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
                 switch utType {
                 case .jpeg:
                     mimeType = "image/jpeg"
@@ -131,18 +130,18 @@ public final class UTIHelper: NSObject {
                 return nil
                 #endif
             }
-            
+
         } else {
             let unmanagedMime = UTTypeCopyPreferredTagWithClass(uti as CFString, kUTTagClassMIMEType)
-            
+
             guard let retainedValue = unmanagedMime?.takeRetainedValue() else {
                 return nil
             }
-            
+
             mimeType = retainedValue as String
         }
-        
+
         return mimeType
     }
-    
+
 }
