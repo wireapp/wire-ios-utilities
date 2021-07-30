@@ -23,14 +23,14 @@ import CoreServices
 
 @objc
 public final class UTIHelper: NSObject {
-
+    
     @objc
     public class func conformsToImageType(uti: String) -> Bool {
         if #available(iOS 14, *) {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-
+            
             return utType.conforms(to: UniformTypeIdentifiers.UTType.image) || utType.conforms(to: UniformTypeIdentifiers.UTType.jpeg)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
@@ -44,14 +44,31 @@ public final class UTIHelper: NSObject {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-
+            
+            #if targetEnvironment(simulator)
+            ///HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+            #endif
+            
             return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
             return UTTypeConformsTo(mimeType as CFString, kUTTypeScalableVectorGraphics)
         }
     }
-
+    
+    @objc
+    public class func convertToUti(mime: String) -> String? {
+        if #available(iOS 14, *) {
+            let utType: UniformTypeIdentifiers.UTType?
+            utType = UniformTypeIdentifiers.UTType(mimeType: mime)
+            
+            return utType?.identifier
+        } else {
+            let cfString = UTTypeCreatePreferredIdentifierForTag(mime as CFString, kUTTagClassMIMEType as CFString, nil)?.takeRetainedValue()
+            
+            return cfString as String?
+        }
+    }
     
     @objc
     public class func convertToMime(uti: String) -> String? {
@@ -61,7 +78,7 @@ public final class UTIHelper: NSObject {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return nil
             }
-
+            
             if let preferredMIMEType = utType.preferredMIMEType {
                 mimeType = preferredMIMEType
             } else {
@@ -83,18 +100,18 @@ public final class UTIHelper: NSObject {
                 return nil
                 #endif
             }
-
+            
         } else {
             let unmanagedMime = UTTypeCopyPreferredTagWithClass(uti as CFString, kUTTagClassMIMEType)
             
             guard let retainedValue = unmanagedMime?.takeRetainedValue() else {
                 return nil
             }
-
+            
             mimeType = retainedValue as String
         }
-
+        
         return mimeType
     }
-
+    
 }
