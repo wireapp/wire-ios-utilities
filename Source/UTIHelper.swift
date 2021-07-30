@@ -31,7 +31,10 @@ public final class UTIHelper: NSObject {
                 return false
             }
             
-            return utType.conforms(to: UniformTypeIdentifiers.UTType.image) || utType.conforms(to: UniformTypeIdentifiers.UTType.jpeg)
+            return utType.conforms(to: .image) ||
+//                utType.isSubtype(of: .image)
+            utType.conforms(to: .jpeg) ||
+            utType.conforms(to: .gif)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
             return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
@@ -44,11 +47,7 @@ public final class UTIHelper: NSObject {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-            
-            #if targetEnvironment(simulator)
-            ///HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
-            #endif
-            
+                        
             return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
@@ -59,9 +58,23 @@ public final class UTIHelper: NSObject {
     @objc
     public class func convertToUti(mime: String) -> String? {
         if #available(iOS 14, *) {
-            let utType: UniformTypeIdentifiers.UTType?
+            var utType: UniformTypeIdentifiers.UTType?
             utType = UniformTypeIdentifiers.UTType(mimeType: mime)
             
+            #if targetEnvironment(simulator)
+            ///HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+            if utType == nil {
+                switch mime {
+                case "image/jpeg":
+                    utType = .jpeg
+                case "image/gif":
+                    utType = .gif
+                default:
+                    break
+                }
+            }
+            #endif
+
             return utType?.identifier
         } else {
             let cfString = UTTypeCreatePreferredIdentifierForTag(mime as CFString, kUTTagClassMIMEType as CFString, nil)?.takeRetainedValue()
