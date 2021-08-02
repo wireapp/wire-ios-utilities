@@ -39,9 +39,7 @@ public final class UTIHelper: NSObject {
             return utType.conforms(to: .image)
             #endif
         } else {
-            guard let mimeType = convertToMime(uti: uti) else { return false }
-            
-            return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
+            return UTTypeConformsTo(uti as CFString, kUTTypeImage)
         }
     }
 
@@ -54,12 +52,10 @@ public final class UTIHelper: NSObject {
 
             return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
         } else {
-            guard let mimeType = convertToMime(uti: uti) else { return false }
-            
-            return UTTypeConformsTo(mimeType as CFString, kUTTypeScalableVectorGraphics)
+            return UTTypeConformsTo(uti as CFString, kUTTypeScalableVectorGraphics)
         }
     }
-
+    
     @objc
     public class func conformsToJsonType(uti: String) -> Bool {
         if #available(iOS 14, *) {
@@ -69,8 +65,7 @@ public final class UTIHelper: NSObject {
 
             return utType.conforms(to: UniformTypeIdentifiers.UTType.json)
         } else {
-            guard let mimeType = convertToMime(uti: uti) else { return false }
-            return UTTypeConformsTo(mimeType as CFString, kUTTypeJSON)
+            return UTTypeConformsTo(uti as CFString, kUTTypeJSON)
         }
     }
 

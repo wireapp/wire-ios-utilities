@@ -17,6 +17,9 @@
 //
 
 import XCTest
+import UniformTypeIdentifiers
+import CoreServices
+@testable import WireUtilities
 
 final class UTIHelperTests: XCTestCase {
 
