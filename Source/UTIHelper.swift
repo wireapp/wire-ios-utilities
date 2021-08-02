@@ -29,11 +29,15 @@ public final class UTIHelper: NSObject {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-
+            #if targetEnvironment(simulator)
+            //HACK: arm64 simulator return false for utType.conforms(to: .image), but add additional subtype check works
             return utType.conforms(to: .image) ||
-                    utType.conforms(to: .png) ||
-                    utType.conforms(to: .jpeg) ||
-                    utType.conforms(to: .gif)
+                                utType.conforms(to: .png) ||
+                                utType.conforms(to: .jpeg) ||
+                                utType.conforms(to: .gif)
+            #else
+            return utType.conforms(to: .image)
+            #endif
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
             return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
