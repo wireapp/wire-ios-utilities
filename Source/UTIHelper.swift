@@ -40,6 +40,7 @@ public final class UTIHelper: NSObject {
             #endif
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
+            
             return UTTypeConformsTo(mimeType as CFString, kUTTypeImage)
         }
     }
@@ -54,6 +55,7 @@ public final class UTIHelper: NSObject {
             return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
+            
             return UTTypeConformsTo(mimeType as CFString, kUTTypeScalableVectorGraphics)
         }
     }
@@ -68,7 +70,7 @@ public final class UTIHelper: NSObject {
             return utType.conforms(to: UniformTypeIdentifiers.UTType.json)
         } else {
             guard let mimeType = convertToMime(uti: uti) else { return false }
-            return UTTypeConformsTo(mimeType as CFString, kUTTypeScalableVectorGraphics)
+            return UTTypeConformsTo(mimeType as CFString, kUTTypeJSON)
         }
     }
 
@@ -98,9 +100,9 @@ public final class UTIHelper: NSObject {
 
             return utType?.identifier
         } else {
-            let cfString = UTTypeCreatePreferredIdentifierForTag(mime as CFString, kUTTagClassMIMEType as CFString, nil)?.takeRetainedValue()
-
-            return cfString as String?
+            return UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
+                                                                 mime as CFString,
+                                                                 kUTTypeContent)?.takeRetainedValue() as String?
         }
     }
 
