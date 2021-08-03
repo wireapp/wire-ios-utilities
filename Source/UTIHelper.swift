@@ -107,7 +107,7 @@ public final class UTIHelper: NSObject {
             if utType == nil {
                 
                 let imageTypes: [UniformTypeIdentifiers.UTType] = [.jpeg, .gif, .png, .json, .svg]
-                for type in imageTypes{
+                for type in imageTypes {
                     if mime == type.mimeType {
                         utType = type
                         break
