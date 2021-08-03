@@ -22,7 +22,7 @@ import CoreServices
 
 @objc
 public final class UTIHelper: NSObject {
-
+    
     @objc
     public class func conformsToImageType(uti: String) -> Bool {
         if #available(iOS 14, *) {
@@ -32,9 +32,10 @@ public final class UTIHelper: NSObject {
             #if targetEnvironment(simulator)
             //HACK: arm64 simulator return false for utType.conforms(to: .image), but add additional subtype check works
             return utType.conforms(to: .image) ||
-                                utType.conforms(to: .png) ||
-                                utType.conforms(to: .jpeg) ||
-                                utType.conforms(to: .gif)
+                utType.conforms(to: .png) ||
+                utType.conforms(to: .jpeg) ||
+                utType.conforms(to: .gif) ||
+                utType.conforms(to: .svg)
             #else
             return utType.conforms(to: .image)
             #endif
@@ -42,14 +43,14 @@ public final class UTIHelper: NSObject {
             return UTTypeConformsTo(uti as CFString, kUTTypeImage)
         }
     }
-
+    
     @objc
     public class func conformsToVectorType(uti: String) -> Bool {
         if #available(iOS 14, *) {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-
+            
             return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeScalableVectorGraphics)
@@ -62,19 +63,19 @@ public final class UTIHelper: NSObject {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return false
             }
-
+            
             return utType.conforms(to: UniformTypeIdentifiers.UTType.json)
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeJSON)
         }
     }
-
+    
     @objc
     public class func convertToUti(mime: String) -> String? {
         if #available(iOS 14, *) {
             var utType: UniformTypeIdentifiers.UTType?
             utType = UniformTypeIdentifiers.UTType(mimeType: mime)
-
+            
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
@@ -87,12 +88,14 @@ public final class UTIHelper: NSObject {
                     utType = .png
                 case "application/json":
                     utType = .json
+                case "image/svg+xml":
+                    utType = .svg
                 default:
                     break
                 }
             }
             #endif
-
+            
             return utType?.identifier
         } else {
             return UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
@@ -100,16 +103,16 @@ public final class UTIHelper: NSObject {
                                                          kUTTypeContent)?.takeRetainedValue() as String?
         }
     }
-
+    
     @objc
     public class func convertToMime(uti: String) -> String? {
-
+        
         let mimeType: String
         if #available(iOS 14, *) {
             guard let utType = UniformTypeIdentifiers.UTType(uti) else {
                 return nil
             }
-
+            
             if let preferredMIMEType = utType.preferredMIMEType {
                 mimeType = preferredMIMEType
             } else {
@@ -122,6 +125,8 @@ public final class UTIHelper: NSObject {
                     mimeType = "image/png"
                 case .gif:
                     mimeType = "image/gif"
+                case .svg:
+                    mimeType = "image/svg+xml"
                 case .json:
                     mimeType = "application/json"
                 default:
@@ -131,18 +136,18 @@ public final class UTIHelper: NSObject {
                 return nil
                 #endif
             }
-
+            
         } else {
             let unmanagedMime = UTTypeCopyPreferredTagWithClass(uti as CFString, kUTTagClassMIMEType)
-
+            
             guard let retainedValue = unmanagedMime?.takeRetainedValue() else {
                 return nil
             }
-
+            
             mimeType = retainedValue as String
         }
-
+        
         return mimeType
     }
-
+    
 }
