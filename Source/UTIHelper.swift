@@ -96,8 +96,8 @@ public final class UTIHelper: NSObject {
             return utType?.identifier
         } else {
             return UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
-                                                                 mime as CFString,
-                                                                 kUTTypeContent)?.takeRetainedValue() as String?
+                                                         mime as CFString,
+                                                         kUTTypeContent)?.takeRetainedValue() as String?
         }
     }
 
