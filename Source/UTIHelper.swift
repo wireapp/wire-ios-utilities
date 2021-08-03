@@ -17,10 +17,11 @@
 //
 
 import Foundation
+import CoreServices
+
 #if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
 #endif
-import CoreServices
 
 #if targetEnvironment(simulator)
 //HACK: subsitution of .preferredMIMEType(returns nil when arch is x86_64) on arm64 simulator
