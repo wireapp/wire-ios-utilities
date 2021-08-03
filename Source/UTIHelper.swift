@@ -17,7 +17,9 @@
 //
 
 import Foundation
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 import CoreServices
 
 #if targetEnvironment(simulator)
