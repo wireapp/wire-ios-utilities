@@ -20,6 +20,32 @@ import Foundation
 import UniformTypeIdentifiers
 import CoreServices
 
+#if targetEnvironment(simulator)
+//HACK: subsitution of .preferredMIMEType(returns nil when arch is x86_64) on arm64 simulator
+
+@available(iOSApplicationExtension 14.0, *)
+extension UniformTypeIdentifiers.UTType {
+    var mimeType: String? {
+        switch self {
+        case .jpeg:
+            return "image/jpeg"
+        case .png:
+            return "image/png"
+        case .gif:
+            return "image/gif"
+        case .svg:
+            return "image/svg+xml"
+        case .json:
+            return "application/json"
+        default:
+            return nil
+        }
+        
+    }
+}
+
+#endif
+
 @objc
 public final class UTIHelper: NSObject {
     
@@ -79,19 +105,13 @@ public final class UTIHelper: NSObject {
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
-                switch mime {
-                case "image/jpeg":
-                    utType = .jpeg
-                case "image/gif":
-                    utType = .gif
-                case "image/png":
-                    utType = .png
-                case "application/json":
-                    utType = .json
-                case "image/svg+xml":
-                    utType = .svg
-                default:
-                    break
+                
+                let imageTypes: [UniformTypeIdentifiers.UTType] = [.jpeg, .gif, .png, .json, .svg]
+                for type in imageTypes{
+                    if mime == type.mimeType {
+                        utType = type
+                        break
+                    }
                 }
             }
             #endif
@@ -118,20 +138,11 @@ public final class UTIHelper: NSObject {
             } else {
                 #if targetEnvironment(simulator)
                 /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
-                switch utType {
-                case .jpeg:
-                    mimeType = "image/jpeg"
-                case .png:
-                    mimeType = "image/png"
-                case .gif:
-                    mimeType = "image/gif"
-                case .svg:
-                    mimeType = "image/svg+xml"
-                case .json:
-                    mimeType = "application/json"
-                default:
+                guard let type = utType.mimeType else {
                     return nil
                 }
+                
+                mimeType = type
                 #else
                 return nil
                 #endif
