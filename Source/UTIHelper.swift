@@ -24,10 +24,21 @@ import CoreServices
 #endif
 
 #if targetEnvironment(simulator)
-//HACK: subsitution of .preferredMIMEType(returns nil when arch is x86_64) on arm64 simulator
 
 @available(iOSApplicationExtension 14.0, *)
 extension UTType {
+    var fileExtension: String? {
+        switch self {
+        case .text:
+            return "txt"
+        case .mpeg4Movie:
+            return "mp4"
+        default:
+            return nil
+        }
+    }
+    
+    /// HACK: subsitution of .preferredMIMEType(returns nil when arch is x86_64) on arm64 simulator
     var mimeType: String? {
         switch self {
         case .jpeg:
@@ -152,7 +163,7 @@ public final class UTIHelper: NSObject {
     
     #if targetEnvironment(simulator)
     @available(iOSApplicationExtension 14.0, *)
-    private static let utTypes: [UTType] = [.jpeg, .gif, .png, .json, .svg, .mpeg4Movie]
+    private static let utTypes: [UTType] = [.jpeg, .gif, .png, .json, .svg, .mpeg4Movie, .text]
     #endif
     
     @objc
@@ -190,12 +201,13 @@ public final class UTIHelper: NSObject {
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
-//                for type in imageTypes {
-                if fileExtension == "txt" {
-                        utType = UTType.text
-//                        break
+                for type in utTypes {
+                    let ext = type.fileExtension
+                    if fileExtension == type.fileExtension {
+                        utType = type
+                        break
                     }
-//                }
+                }
             }
             #endif
             

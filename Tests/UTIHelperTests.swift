@@ -23,7 +23,7 @@ import CoreServices
 
 final class UTIHelperTests: XCTestCase {
 
-    func testThatconformsToVectorTypeIdentifiesSVG() {
+    func testThatConformsToVectorTypeIdentifiesSVG() {
         // given, when, then
         XCTAssert(UTIHelper.conformsToVectorType(uti: "public.svg-image"))
     }
@@ -81,5 +81,10 @@ final class UTIHelperTests: XCTestCase {
         XCTAssertEqual(UTIHelper.convertToMime(uti: "public.svg-image"), "image/svg+xml")
         XCTAssertEqual(UTIHelper.convertToMime(uti: "public.mpeg-4"), "video/mp4")
 
+    }
+
+    func testThatConvertToMimeConvertsFileExtensions() {
+        XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "txt"), "text/plain")
+        XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "mp4"), "video/mp4")
     }
 }
