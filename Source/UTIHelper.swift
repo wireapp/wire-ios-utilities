@@ -66,13 +66,26 @@ extension UTType {
 
 @objc
 public final class UTIHelper: NSObject {
-    
+        
+    @available(iOSApplicationExtension 14.0, *)
+    private class func conformsTo(uti: String, type: UTType) -> Bool {
+        guard let utType = UTType(uti) else {
+            return false
+        }
+        
+        return utType.conforms(to: type)
+
+    }
+        
+    //MARK: - UTI conformation
+
     @objc
     public class func conformsToImageType(uti: String) -> Bool {
         if #available(iOS 14, *) {
             guard let utType = UTType(uti) else {
                 return false
             }
+            
             #if targetEnvironment(simulator)
             //HACK: arm64 simulator return false for utType.conforms(to: .image), but add additional subtype check works
             return utType.conforms(to: .image) ||
@@ -88,6 +101,26 @@ public final class UTIHelper: NSObject {
         }
     }
 
+    @objc
+    public class func conformsToVectorType(uti: String) -> Bool {
+        if #available(iOS 14, *) {
+            return UTType(uti)?.conforms(to: .svg) ?? false
+        } else {
+            return UTTypeConformsTo(uti as CFString, kUTTypeScalableVectorGraphics)
+        }
+    }
+    
+    @objc
+    public class func conformsToJsonType(uti: String) -> Bool {
+        if #available(iOS 14, *) {
+            return UTType(uti)?.conforms(to: .json) ?? false
+        } else {
+            return UTTypeConformsTo(uti as CFString, kUTTypeJSON)
+        }
+    }
+
+    //MARK: - MIME conformation
+    
     public class func conformsToGifType(mime: String) -> Bool {
         guard let uti = convertToUti(mime: mime) else { return false }
         
@@ -96,16 +129,6 @@ public final class UTIHelper: NSObject {
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeGIF)
         }
-    }
-    
-    @available(iOSApplicationExtension 14.0, *)
-    private class func conformsTo(uti: String, type: UTType) -> Bool {
-        guard let utType = UTType(uti) else {
-            return false
-        }
-        
-        return utType.conforms(to: type)
-
     }
     
     public class func conformsToAudioType(mime: String) -> Bool {
@@ -128,43 +151,19 @@ public final class UTIHelper: NSObject {
             return UTTypeConformsTo(uti as CFString, kUTTypeMovie)
         }
     }
-    
+
     public class func conformsToVectorType(mime: String) -> Bool {
         guard let uti = convertToUti(mime: mime) else { return false }
         
         return conformsToVectorType(uti: uti)
     }
 
-    @objc
-    public class func conformsToVectorType(uti: String) -> Bool {
-        if #available(iOS 14, *) {
-            guard let utType = UTType(uti) else {
-                return false
-            }
-            
-            return utType.conforms(to: .svg)
-        } else {
-            return UTTypeConformsTo(uti as CFString, kUTTypeScalableVectorGraphics)
-        }
-    }
-    
-    @objc
-    public class func conformsToJsonType(uti: String) -> Bool {
-        if #available(iOS 14, *) {
-            guard let utType = UTType(uti) else {
-                return false
-            }
-            
-            return utType.conforms(to: UTType.json)
-        } else {
-            return UTTypeConformsTo(uti as CFString, kUTTypeJSON)
-        }
-    }
-    
     #if targetEnvironment(simulator)
     @available(iOSApplicationExtension 14.0, *)
     private static let utTypes: [UTType] = [.jpeg, .gif, .png, .json, .svg, .mpeg4Movie, .text]
     #endif
+    
+    //MARK: - converters
     
     @objc
     public class func convertToUti(mime: String) -> String? {
@@ -192,7 +191,6 @@ public final class UTIHelper: NSObject {
         }
     }
 
-    ///TODO: txt not work on M1
     public class func convertToMime(fileExtension: String) -> String? {
         if #available(iOS 14, *) {
             var utType: UTType?
@@ -202,7 +200,6 @@ public final class UTIHelper: NSObject {
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
                 for type in utTypes {
-                    let ext = type.fileExtension
                     if fileExtension == type.fileExtension {
                         utType = type
                         break
@@ -212,7 +209,7 @@ public final class UTIHelper: NSObject {
             #endif
             
             if let utType = utType {
-                return mime(utType: utType)
+                return mime(from: utType)
             }
             
             return nil
@@ -224,7 +221,7 @@ public final class UTIHelper: NSObject {
     }
     
     @available(iOSApplicationExtension 14.0, *)
-    private class func mime(utType: UTType) -> String? {
+    private class func mime(from utType: UTType) -> String? {
         let mimeType: String
 
         if let preferredMIMEType = utType.preferredMIMEType {
@@ -253,7 +250,7 @@ public final class UTIHelper: NSObject {
                 return nil
             }
             
-            return mime(utType: utType)
+            return mime(from: utType)
         } else {
             let unmanagedMime = UTTypeCopyPreferredTagWithClass(uti as CFString, kUTTagClassMIMEType)
             
