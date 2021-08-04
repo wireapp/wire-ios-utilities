@@ -214,9 +214,11 @@ public final class UTIHelper: NSObject {
             
             return nil
         } else {
-            return UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+            guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
                                                          fileExtension as CFString,
-                                                         kUTTypeContent)?.takeRetainedValue() as String?
+                                                         kUTTypeContent)?.takeRetainedValue() as String? else { return nil }
+            
+            return convertToMime(uti: uti)
         }
     }
     
