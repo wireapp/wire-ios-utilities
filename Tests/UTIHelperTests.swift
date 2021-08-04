@@ -39,6 +39,17 @@ final class UTIHelperTests: XCTestCase {
         XCTAssert(UTIHelper.conformsToJsonType(uti: sut))
     }
 
+    func testThatConformsMovieType() {
+        // given
+        let sut = "video/mp4"
+
+        // when & then
+        XCTAssertFalse(UTIHelper.conformsToImageType(uti: sut))
+        XCTAssertFalse(UTIHelper.conformsToVectorType(uti: sut))
+
+        XCTAssert(UTIHelper.conformsToMovieType(mime: sut))
+    }
+
     func testThatConformsToImageTypeIdentifiesCommonImageTypes() {
         // given
         let suts = ["public.jpeg",

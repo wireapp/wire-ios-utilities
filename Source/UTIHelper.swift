@@ -19,6 +19,9 @@
 import Foundation
 import UniformTypeIdentifiers
 import CoreServices
+#if os(iOS)
+    import MobileCoreServices
+#endif
 
 #if targetEnvironment(simulator)
 //HACK: subsitution of .preferredMIMEType(returns nil when arch is x86_64) on arm64 simulator
@@ -108,7 +111,8 @@ public final class UTIHelper: NSObject {
         guard let uti = convertToUti(mime: mime) else { return false }
         
         if #available(iOS 14, *) {
-            return conformsTo(uti: uti, type: .movie)
+            return conformsTo(uti: uti, type: .movie) ||
+                conformsTo(uti: uti, type: .mpeg4Movie)
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeMovie)
         }
@@ -127,7 +131,7 @@ public final class UTIHelper: NSObject {
                 return false
             }
             
-            return utType.conforms(to: UTType.svg)
+            return utType.conforms(to: .svg)
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeScalableVectorGraphics)
         }
