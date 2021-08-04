@@ -24,7 +24,7 @@ import CoreServices
 //HACK: subsitution of .preferredMIMEType(returns nil when arch is x86_64) on arm64 simulator
 
 @available(iOSApplicationExtension 14.0, *)
-extension UniformTypeIdentifiers.UTType {
+extension UTType {
     var mimeType: String? {
         switch self {
         case .jpeg:
@@ -37,6 +37,10 @@ extension UniformTypeIdentifiers.UTType {
             return "image/svg+xml"
         case .json:
             return "application/json"
+        case .text:
+            return "text/plain"
+        case .mpeg4Movie:
+            return "video/mp4"
         default:
             return nil
         }
@@ -52,7 +56,7 @@ public final class UTIHelper: NSObject {
     @objc
     public class func conformsToImageType(uti: String) -> Bool {
         if #available(iOS 14, *) {
-            guard let utType = UniformTypeIdentifiers.UTType(uti) else {
+            guard let utType = UTType(uti) else {
                 return false
             }
             #if targetEnvironment(simulator)
@@ -69,15 +73,61 @@ public final class UTIHelper: NSObject {
             return UTTypeConformsTo(uti as CFString, kUTTypeImage)
         }
     }
+
+    public class func conformsToGifType(mime: String) -> Bool {
+        guard let uti = convertToUti(mime: mime) else { return false }
+        
+        if #available(iOS 14, *) {
+            return conformsTo(uti: uti, type: .gif)
+        } else {
+            return UTTypeConformsTo(uti as CFString, kUTTypeGIF)
+        }
+    }
     
+    @available(iOSApplicationExtension 14.0, *)
+    private class func conformsTo(uti: String, type: UTType) -> Bool {
+        guard let utType = UTType(uti) else {
+            return false
+        }
+        
+        return utType.conforms(to: type)
+
+    }
+    
+    public class func conformsToAudioType(mime: String) -> Bool {
+        guard let uti = convertToUti(mime: mime) else { return false }
+        
+        if #available(iOS 14, *) {
+            return conformsTo(uti: uti, type: .audio)
+        } else {
+            return UTTypeConformsTo(uti as CFString, kUTTypeAudio)
+        }
+    }
+    
+    public class func conformsToMovieType(mime: String) -> Bool {
+        guard let uti = convertToUti(mime: mime) else { return false }
+        
+        if #available(iOS 14, *) {
+            return conformsTo(uti: uti, type: .movie)
+        } else {
+            return UTTypeConformsTo(uti as CFString, kUTTypeMovie)
+        }
+    }
+    
+    public class func conformsToVectorType(mime: String) -> Bool {
+        guard let uti = convertToUti(mime: mime) else { return false }
+        
+        return conformsToVectorType(uti: uti)
+    }
+
     @objc
     public class func conformsToVectorType(uti: String) -> Bool {
         if #available(iOS 14, *) {
-            guard let utType = UniformTypeIdentifiers.UTType(uti) else {
+            guard let utType = UTType(uti) else {
                 return false
             }
             
-            return utType.conforms(to: UniformTypeIdentifiers.UTType.svg)
+            return utType.conforms(to: UTType.svg)
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeScalableVectorGraphics)
         }
@@ -86,28 +136,31 @@ public final class UTIHelper: NSObject {
     @objc
     public class func conformsToJsonType(uti: String) -> Bool {
         if #available(iOS 14, *) {
-            guard let utType = UniformTypeIdentifiers.UTType(uti) else {
+            guard let utType = UTType(uti) else {
                 return false
             }
             
-            return utType.conforms(to: UniformTypeIdentifiers.UTType.json)
+            return utType.conforms(to: UTType.json)
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeJSON)
         }
     }
     
+    #if targetEnvironment(simulator)
+    @available(iOSApplicationExtension 14.0, *)
+    private static let utTypes: [UTType] = [.jpeg, .gif, .png, .json, .svg, .mpeg4Movie]
+    #endif
+    
     @objc
     public class func convertToUti(mime: String) -> String? {
         if #available(iOS 14, *) {
-            var utType: UniformTypeIdentifiers.UTType?
-            utType = UniformTypeIdentifiers.UTType(mimeType: mime)
+            var utType: UTType?
+            utType = UTType(mimeType: mime)
             
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
-                
-                let imageTypes: [UniformTypeIdentifiers.UTType] = [.jpeg, .gif, .png, .json, .svg]
-                for type in imageTypes {
+                for type in utTypes {
                     if mime == type.mimeType {
                         utType = type
                         break
@@ -123,31 +176,68 @@ public final class UTIHelper: NSObject {
                                                          kUTTypeContent)?.takeRetainedValue() as String?
         }
     }
+
+    ///TODO: txt not work on M1
+    public class func convertToMime(fileExtension: String) -> String? {
+        if #available(iOS 14, *) {
+            var utType: UTType?
+            utType = UTType(filenameExtension: fileExtension)
+
+            #if targetEnvironment(simulator)
+            /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+            if utType == nil {
+//                for type in imageTypes {
+                if fileExtension == "txt" {
+                        utType = UTType.text
+//                        break
+                    }
+//                }
+            }
+            #endif
+            
+            if let utType = utType {
+                return mime(utType: utType)
+            }
+            
+            return nil
+        } else {
+            return UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+                                                         fileExtension as CFString,
+                                                         kUTTypeContent)?.takeRetainedValue() as String?
+        }
+    }
     
+    @available(iOSApplicationExtension 14.0, *)
+    private class func mime(utType: UTType) -> String? {
+        let mimeType: String
+
+        if let preferredMIMEType = utType.preferredMIMEType {
+            mimeType = preferredMIMEType
+        } else {
+            #if targetEnvironment(simulator)
+            /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+            guard let type = utType.mimeType else {
+                return nil
+            }
+            
+            mimeType = type
+            #else
+            return nil
+            #endif
+        }
+
+        return mimeType
+    }
+
     @objc
     public class func convertToMime(uti: String) -> String? {
-        
-        let mimeType: String
+
         if #available(iOS 14, *) {
-            guard let utType = UniformTypeIdentifiers.UTType(uti) else {
+            guard let utType = UTType(uti) else {
                 return nil
             }
             
-            if let preferredMIMEType = utType.preferredMIMEType {
-                mimeType = preferredMIMEType
-            } else {
-                #if targetEnvironment(simulator)
-                /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
-                guard let type = utType.mimeType else {
-                    return nil
-                }
-                
-                mimeType = type
-                #else
-                return nil
-                #endif
-            }
-            
+            return mime(utType: utType)
         } else {
             let unmanagedMime = UTTypeCopyPreferredTagWithClass(uti as CFString, kUTTagClassMIMEType)
             
@@ -155,10 +245,8 @@ public final class UTIHelper: NSObject {
                 return nil
             }
             
-            mimeType = retainedValue as String
+            return retainedValue as String
         }
-        
-        return mimeType
     }
     
 }

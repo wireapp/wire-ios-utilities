@@ -59,6 +59,7 @@ final class UTIHelperTests: XCTestCase {
         XCTAssertEqual(UTIHelper.convertToUti(mime: "image/gif"), "com.compuserve.gif")
         XCTAssertEqual(UTIHelper.convertToUti(mime: "image/png"), "public.png")
         XCTAssertEqual(UTIHelper.convertToUti(mime: "image/svg+xml"), "public.svg-image")
+        XCTAssertEqual(UTIHelper.convertToUti(mime: "video/mp4"), "public.mpeg-4")
     }
 
     func testThatConvertToMimeConvertsCommonImageTypes() {
@@ -67,6 +68,7 @@ final class UTIHelperTests: XCTestCase {
         XCTAssertEqual(UTIHelper.convertToMime(uti: "com.compuserve.gif"), "image/gif")
         XCTAssertEqual(UTIHelper.convertToMime(uti: "public.png"), "image/png")
         XCTAssertEqual(UTIHelper.convertToMime(uti: "public.svg-image"), "image/svg+xml")
+        XCTAssertEqual(UTIHelper.convertToMime(uti: "public.mpeg-4"), "video/mp4")
 
     }
 }
