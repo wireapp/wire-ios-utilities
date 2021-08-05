@@ -74,7 +74,6 @@ public final class UTIHelper: NSObject {
         }
         
         return utType.conforms(to: type)
-
     }
         
     //MARK: - UTI conformation
