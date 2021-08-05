@@ -187,7 +187,7 @@ public final class UTIHelper: NSObject {
         } else {
             return UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
                                                          mime as CFString,
-                                                         kUTTypeContent)?.takeRetainedValue() as String?
+                                                         nil)?.takeRetainedValue() as String?
         }
     }
 
@@ -195,6 +195,10 @@ public final class UTIHelper: NSObject {
         if #available(iOS 14, *) {
             var utType: UTType?
             utType = UTType(filenameExtension: fileExtension)
+
+            if utType == nil {///not work on M1
+                utType = UTType(filenameExtension: fileExtension, conformingTo: .package)
+            }
 
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
@@ -216,7 +220,7 @@ public final class UTIHelper: NSObject {
         } else {
             guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
                                                          fileExtension as CFString,
-                                                         kUTTypeContent)?.takeRetainedValue() as String? else { return nil }
+                                                         nil)?.takeRetainedValue() as String? else { return nil }
             
             return convertToMime(uti: uti)
         }

@@ -84,6 +84,7 @@ final class UTIHelperTests: XCTestCase {
     }
 
     func testThatConvertToMimeConvertsFileExtensions() {
+        XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "pkpass"), "application/vnd.apple.pkpass")
         XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "txt"), "text/plain")
         XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "mp4"), "video/mp4")
     }
