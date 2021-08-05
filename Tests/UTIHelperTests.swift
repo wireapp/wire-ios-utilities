@@ -88,4 +88,9 @@ final class UTIHelperTests: XCTestCase {
         XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "txt"), "text/plain")
         XCTAssertEqual(UTIHelper.convertToMime(fileExtension: "mp4"), "video/mp4")
     }
+
+    func testThatConvertToFileExtensionHandlesCommonTypes() {
+        XCTAssertEqual(UTIHelper.convertToFileExtension(mime: "video/mp4"), "mp4")
+        XCTAssertEqual(UTIHelper.convertToFileExtension(mime: "text/plain"), "txt")
+    }
 }

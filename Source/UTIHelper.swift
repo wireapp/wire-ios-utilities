@@ -163,12 +163,32 @@ public final class UTIHelper: NSObject {
     #endif
     
     //MARK: - converters
+
+    public class func convertToFileExtension(mime: String) -> String? {
+        if #available(iOS 14, *) {
+            let utType: UTType? = UTType(mimeType: mime)
+            var filenameExtension = utType?.preferredFilenameExtension
+            
+            #if targetEnvironment(simulator)
+            if filenameExtension == nil {
+                filenameExtension = utType?.fileExtension
+            }
+            #endif
+
+            return filenameExtension
+        } else {
+            guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mime as CFString, nil),
+                let extensionUTI = UTTypeCopyPreferredTagWithClass(uti.takeRetainedValue(), kUTTagClassFilenameExtension) else {
+                    return nil
+            }
+            return String(extensionUTI.takeRetainedValue())
+        }
+    }
     
     @objc
     public class func convertToUti(mime: String) -> String? {
         if #available(iOS 14, *) {
-            var utType: UTType?
-            utType = UTType(mimeType: mime)
+            var utType: UTType? = UTType(mimeType: mime)
             
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
