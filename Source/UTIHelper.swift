@@ -216,6 +216,16 @@ public final class UTIHelper: NSObject {
                 mimeType = iOS13ConvertToMime(fileExtension: fileExtension)
             }
             
+            #if targetEnvironment(simulator)
+            /// HACK: hard code MIME when iOS13ConvertToMime not work for M1 simulator for extsion pkpass, we should file a ticket to apple for this issue
+            if mimeType == nil {
+                if fileExtension == "pkpass" {
+                    mimeType = "application/vnd.apple.pkpass"
+                }
+            }
+            #endif
+
+            
             return mimeType
         } else {
             return iOS13ConvertToMime(fileExtension: fileExtension)
