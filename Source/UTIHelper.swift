@@ -229,6 +229,11 @@ public final class UTIHelper: NSObject {
     public class func convertToMime(fileExtension: String) -> String? {
         if #available(iOS 14, *) {
             var utType: UTType? = UTType(filenameExtension: fileExtension)
+            
+            // for uttype not conforming data, e.g com.apple.pkpass, retry with conformingTo: nil
+            if utType == nil {                
+                utType = UTType(tag: fileExtension, tagClass: .filenameExtension, conformingTo: nil)
+            }
 
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
@@ -251,16 +256,6 @@ public final class UTIHelper: NSObject {
             if mimeType == nil {
                 mimeType = iOS13ConvertToMime(fileExtension: fileExtension)
             }
-            
-            #if targetEnvironment(simulator)
-            /// HACK: hard code MIME when iOS13ConvertToMime not work for M1 simulator for extsion pkpass, we should file a ticket to apple for this issue
-            if mimeType == nil {
-                if fileExtension == "pkpass" {
-                    mimeType = "application/vnd.apple.pkpass"
-                }
-            }
-            #endif
-
             
             return mimeType
         } else {
