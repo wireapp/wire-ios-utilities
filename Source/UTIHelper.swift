@@ -211,7 +211,7 @@ public final class UTIHelper: NSObject {
                 mimeType = mime(from: utType)
             }
             
-            /// HACK: when resolbing .pkpass file extension, the above method returns nil, fallback to iOS 13- method.
+            /// HACK: when resolving .pkpass file extension, the above method returns nil, fallback to iOS 13- method.
             if mimeType == nil {
                 mimeType = iOS13ConvertToMime(fileExtension: fileExtension)
             }
