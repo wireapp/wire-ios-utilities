@@ -169,7 +169,7 @@ public final class UTIHelper: NSObject {
             var utType: UTType? = UTType(mimeType: mime)
 
             // for uttype not conforming data, e.g pkpass, retry with conformingTo: nil
-            if utType == nil {
+            if utType == nil || utType?.preferredFilenameExtension == nil {
                 utType = UTType(tag: mime, tagClass: .mimeType, conformingTo: nil)
             }
 
