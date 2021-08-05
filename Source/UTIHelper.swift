@@ -77,13 +77,6 @@ public final class UTIHelper: NSObject {
     }
         
     //MARK: - UTI conformation
-    public class func conformsToGifType(uti: String) -> Bool {        
-        if #available(iOS 14, *) {
-            return conformsTo(uti: uti, type: .gif)
-        } else {
-            return UTTypeConformsTo(uti as CFString, kUTTypeGIF)
-        }
-    }
 
     @objc
     public class func conformsToImageType(uti: String) -> Bool {
@@ -130,7 +123,11 @@ public final class UTIHelper: NSObject {
     public class func conformsToGifType(mime: String) -> Bool {
         guard let uti = convertToUti(mime: mime) else { return false }
         
-        return conformsToGifType(uti: uti)
+        if #available(iOS 14, *) {
+            return conformsTo(uti: uti, type: .gif)
+        } else {
+            return UTTypeConformsTo(uti as CFString, kUTTypeGIF)
+        }
     }
     
     public class func conformsToAudioType(mime: String) -> Bool {
@@ -170,6 +167,11 @@ public final class UTIHelper: NSObject {
     public class func convertToFileExtension(mime: String) -> String? {
         if #available(iOS 14, *) {
             var utType: UTType? = UTType(mimeType: mime)
+
+            // for uttype not conforming data, e.g pkpass, retry with conformingTo: nil
+            if utType == nil || utType?.preferredFilenameExtension == nil {
+                utType = UTType(tag: mime, tagClass: .mimeType, conformingTo: nil)
+            }
 
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
@@ -232,6 +234,11 @@ public final class UTIHelper: NSObject {
     public class func convertToMime(fileExtension: String) -> String? {
         if #available(iOS 14, *) {
             var utType: UTType? = UTType(filenameExtension: fileExtension)
+            
+            // for uttype not conforming data, e.g com.apple.pkpass, retry with conformingTo: nil
+            if utType == nil {                
+                utType = UTType(tag: fileExtension, tagClass: .filenameExtension, conformingTo: nil)
+            }
 
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
@@ -254,16 +261,6 @@ public final class UTIHelper: NSObject {
             if mimeType == nil {
                 mimeType = iOS13ConvertToMime(fileExtension: fileExtension)
             }
-            
-            #if targetEnvironment(simulator)
-            /// HACK: hard code MIME when iOS13ConvertToMime not work for M1 simulator for extsion pkpass, we should file a ticket to apple for this issue
-            if mimeType == nil {
-                if fileExtension == "pkpass" {
-                    mimeType = "application/vnd.apple.pkpass"
-                }
-            }
-            #endif
-
             
             return mimeType
         } else {
