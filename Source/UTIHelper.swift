@@ -193,12 +193,7 @@ public final class UTIHelper: NSObject {
 
     public class func convertToMime(fileExtension: String) -> String? {
         if #available(iOS 14, *) {
-            var utType: UTType?
-            utType = UTType(filenameExtension: fileExtension)
-
-            if utType == nil {///not work on M1
-                utType = UTType(filenameExtension: fileExtension, conformingTo: .package)
-            }
+            var utType: UTType? = UTType(filenameExtension: fileExtension)
 
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
@@ -212,18 +207,28 @@ public final class UTIHelper: NSObject {
             }
             #endif
             
+            var mimeType: String?
             if let utType = utType {
-                return mime(from: utType)
+                mimeType = mime(from: utType)
             }
             
-            return nil
-        } else {
-            guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
-                                                         fileExtension as CFString,
-                                                         nil)?.takeRetainedValue() as String? else { return nil }
+            /// HACK: when resolbing .pkpass file extension, the above method returns nil, fallback to iOS 13- method.
+            if mimeType == nil {
+                mimeType = iOS13ConvertToMime(fileExtension: fileExtension)
+            }
             
-            return convertToMime(uti: uti)
+            return mimeType
+        } else {
+            return iOS13ConvertToMime(fileExtension: fileExtension)
         }
+    }
+    
+    private class func iOS13ConvertToMime(fileExtension: String) -> String? {
+        guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+                                                              fileExtension as CFString,
+                                                              nil)?.takeRetainedValue() as String? else { return nil }
+        
+        return convertToMime(uti: uti)
     }
     
     @available(iOSApplicationExtension 14.0, *)
