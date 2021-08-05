@@ -166,7 +166,15 @@ public final class UTIHelper: NSObject {
 
     public class func convertToFileExtension(mime: String) -> String? {
         if #available(iOS 14, *) {
-            let utType: UTType? = UTType(mimeType: mime)
+            var utType: UTType? = UTType(mimeType: mime)
+
+            #if targetEnvironment(simulator)
+            /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
+            if utType == nil {
+                utType = createUTType(mime: mime)
+            }
+            #endif
+
             var filenameExtension = utType?.preferredFilenameExtension
             
             #if targetEnvironment(simulator)
@@ -185,6 +193,19 @@ public final class UTIHelper: NSObject {
         }
     }
     
+    #if targetEnvironment(simulator)
+    @available(iOSApplicationExtension 14.0, *)
+    private class func createUTType(mime: String) -> UTType? {
+        for type in utTypes {
+            if mime == type.mimeType {
+                return type
+            }
+        }
+        
+        return nil
+    }
+    #endif
+    
     @objc
     public class func convertToUti(mime: String) -> String? {
         if #available(iOS 14, *) {
@@ -193,12 +214,7 @@ public final class UTIHelper: NSObject {
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
-                for type in utTypes {
-                    if mime == type.mimeType {
-                        utType = type
-                        break
-                    }
-                }
+                utType = createUTType(mime: mime)
             }
             #endif
             

@@ -92,5 +92,7 @@ final class UTIHelperTests: XCTestCase {
     func testThatConvertToFileExtensionHandlesCommonTypes() {
         XCTAssertEqual(UTIHelper.convertToFileExtension(mime: "video/mp4"), "mp4")
         XCTAssertEqual(UTIHelper.convertToFileExtension(mime: "text/plain"), "txt")
+        ///TODO: test for pkpass
+//        XCTAssertEqual(UTIHelper.convertToFileExtension(mime: "application/vnd.apple.pkpass"), "pkpass")
     }
 }
