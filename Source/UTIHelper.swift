@@ -168,6 +168,11 @@ public final class UTIHelper: NSObject {
         if #available(iOS 14, *) {
             var utType: UTType? = UTType(mimeType: mime)
 
+            // for uttype not conforming data, e.g pkpass, retry with conformingTo: nil
+            if utType == nil {
+                utType = UTType(tag: mime, tagClass: .mimeType, conformingTo: nil)
+            }
+
             #if targetEnvironment(simulator)
             /// HACK: hard code MIME when preferredMIMEType is nil for M1 simulator, we should file a ticket to apple for this issue
             if utType == nil {
