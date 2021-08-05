@@ -118,9 +118,9 @@
 		87ECBDD51E78457C00596836 /* ExtremeCombiningCharactersValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87ECBDD41E78457C00596836 /* ExtremeCombiningCharactersValidator.swift */; };
 		A944AEEA265E4D9C00164C79 /* WireSystem.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A944AEE7265E4D9B00164C79 /* WireSystem.xcframework */; };
 		A94DA30826BC239400CC626C /* Data+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = A94DA30726BC239400CC626C /* Data+Image.swift */; };
-		A94DA30F26BC254800CC626C /* animated.gif in Resources */ = {isa = PBXBuildFile; fileRef = A94DA30D26BC254800CC626C /* animated.gif */; };
-		A94DA31026BC254800CC626C /* not_animated.gif in Resources */ = {isa = PBXBuildFile; fileRef = A94DA30E26BC254800CC626C /* not_animated.gif */; };
 		A94DA31626BC256E00CC626C /* NSData+ImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A94DA31526BC256E00CC626C /* NSData+ImageTests.swift */; };
+		A94DA32726BC5DE700CC626C /* animated.gif in Resources */ = {isa = PBXBuildFile; fileRef = A94DA32526BC5DE700CC626C /* animated.gif */; };
+		A94DA32826BC5DE700CC626C /* not_animated.gif in Resources */ = {isa = PBXBuildFile; fileRef = A94DA32626BC5DE700CC626C /* not_animated.gif */; };
 		A96755D8265FE98A0062EDC5 /* WireTesting.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A944AEE9265E4D9C00164C79 /* WireTesting.xcframework */; };
 		A96755D9265FE98A0062EDC5 /* WireTesting.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A944AEE9265E4D9C00164C79 /* WireTesting.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A96E00E0265FEF070034A057 /* OCMock.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A944AEE8265E4D9C00164C79 /* OCMock.xcframework */; };
@@ -359,9 +359,9 @@
 		A944AEE8265E4D9C00164C79 /* OCMock.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OCMock.xcframework; path = Carthage/Build/OCMock.xcframework; sourceTree = "<group>"; };
 		A944AEE9265E4D9C00164C79 /* WireTesting.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = WireTesting.xcframework; path = Carthage/Build/WireTesting.xcframework; sourceTree = "<group>"; };
 		A94DA30726BC239400CC626C /* Data+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Image.swift"; sourceTree = "<group>"; };
-		A94DA30D26BC254800CC626C /* animated.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = animated.gif; path = "../../../wire-ios-data-model/Tests/Resources/animated.gif"; sourceTree = "<group>"; };
-		A94DA30E26BC254800CC626C /* not_animated.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = not_animated.gif; path = "../../../wire-ios-data-model/Tests/Resources/not_animated.gif"; sourceTree = "<group>"; };
 		A94DA31526BC256E00CC626C /* NSData+ImageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSData+ImageTests.swift"; sourceTree = "<group>"; };
+		A94DA32526BC5DE700CC626C /* animated.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = animated.gif; sourceTree = "<group>"; };
+		A94DA32626BC5DE700CC626C /* not_animated.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = not_animated.gif; sourceTree = "<group>"; };
 		A98EC2A626B8169700D10C80 /* UTIHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTIHelperTests.swift; sourceTree = "<group>"; };
 		A9A3B1EF24D9814D001AF38E /* Keychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		A9C6EDE326B32E9D007F61C5 /* UTIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTIHelper.swift; sourceTree = "<group>"; };
@@ -475,8 +475,8 @@
 		091799791B7E2F0300E60DD9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A94DA30D26BC254800CC626C /* animated.gif */,
-				A94DA30E26BC254800CC626C /* not_animated.gif */,
+				A94DA32526BC5DE700CC626C /* animated.gif */,
+				A94DA32626BC5DE700CC626C /* not_animated.gif */,
 				544B2FFC1C1FF2DD00384477 /* data_to_hash.enc */,
 				54D06C581BC81976005F0FBB /* android_image.encrypted */,
 				54D06C5A1BC81983005F0FBB /* android_image.decrypted */,
@@ -989,9 +989,9 @@
 				BF4A15CE1D47BECC0051E8BA /* appstore-sandbox.xml in Resources */,
 				BF4A15D01D47BF360051E8BA /* enterprise-sandbox.xml in Resources */,
 				54D06C5C1BC81AFF005F0FBB /* android_image.encrypted in Resources */,
-				A94DA30F26BC254800CC626C /* animated.gif in Resources */,
+				A94DA32726BC5DE700CC626C /* animated.gif in Resources */,
 				544B2FFE1C1FF79500384477 /* data_to_hash.enc in Resources */,
-				A94DA31026BC254800CC626C /* not_animated.gif in Resources */,
+				A94DA32826BC5DE700CC626C /* not_animated.gif in Resources */,
 				877F50211E729CCF00894C90 /* excessive_diacritics.txt in Resources */,
 				BF4A15CC1D47B8860051E8BA /* enterprise-production.xml in Resources */,
 				54D06C5D1BC81B03005F0FBB /* android_image.decrypted in Resources */,
