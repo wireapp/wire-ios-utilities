@@ -44,4 +44,12 @@ final class NSDataImageTests: XCTestCase {
         // when & then
         XCTAssertEqual(sut.mimeType, "image/gif")
     }
+    
+    func testThatTxtmimeTypeIsNotResolved() {
+        // given
+        let sut: Data = self.data(forResource: "excessive_diacritics", extension: "txt")!
+
+        // when & then
+        XCTAssertNil(sut.mimeType)
+    }
 }
