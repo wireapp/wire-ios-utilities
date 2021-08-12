@@ -22,7 +22,7 @@ import ImageIO
 
 extension Data {
     public var mimeType: String? {
-        guard let source = CGImageSourceCreateWithData(self as CFData, nil),
+        guard let source = (self as NSData).imageSource,
               let type = CGImageSourceGetType(source) as String? else {
             return nil
         }
@@ -45,15 +45,13 @@ extension NSData {
     /// - Returns: returns turn if the data is GIF and number of images > 1
     @objc
     public func isDataAnimatedGIF() -> Bool {
-        guard let source = CGImageSourceCreateWithData(self as CFData, nil),
-              let type = CGImageSourceGetType(source) as String? else {
-            return false
-        }
-        
-        guard UTIHelper.conformsToGifType(uti: type) else {
+        guard let source = imageSource,
+              CGImageSourceGetCount(source) > 1,
+              let type = CGImageSourceGetType(source) as String?,
+              UTIHelper.conformsToGifType(uti: type) else {
             return false
         }
 
-        return CGImageSourceGetCount(source) > 1
+        return true
     }
 }
