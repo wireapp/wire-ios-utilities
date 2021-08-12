@@ -21,14 +21,39 @@ import Foundation
 import ImageIO
 
 extension NSData {
+    var imageSource: CGImageSource? {
+        guard length > 0 else {
+            return nil
+        }
+        
+        return CGImageSourceCreateWithData(self as CFData, nil)
+    }
+
+    
+    /// return UTI Type of a CGImageSource
+    /// - Parameter source: a CGImageSource
+    /// - Returns: UTI type string, nullable
+    static func imageSourceType(source: CGImageSource) -> String? {
+        return CGImageSourceGetType(source) as String?
+    }
+    
+    public var mimeType: String? {
+        guard let source = CGImageSourceCreateWithData(self as CFData, nil),
+              let type = NSData.imageSourceType(source: source) else {
+            return nil
+        }
+        
+        return UTIHelper.convertToMime(uti: type)
+    }
+
+    
     /// Returns whether the data represents animated GIF
     /// - Parameter data: image data
     /// - Returns: returns turn if the data is GIF and number of images > 1
     @objc
     public func isDataAnimatedGIF() -> Bool {
-        guard length > 0,
-              let source = CGImageSourceCreateWithData(self as CFData, nil),
-              let type = CGImageSourceGetType(source) as String? else {
+        guard let source = CGImageSourceCreateWithData(self as CFData, nil),
+              let type = NSData.imageSourceType(source: source) else {
             return false
         }
         
