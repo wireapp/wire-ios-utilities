@@ -50,6 +50,14 @@ final class UTIHelperTests: XCTestCase {
         XCTAssert(UTIHelper.conformsToMovieType(mime: sut))
     }
 
+    func testThatQuickTimeMovieConformsMovieType() {
+        // given
+        let sut = "video/quicktime"
+
+        // when & then
+        XCTAssert(UTIHelper.conformsToMovieType(mime: sut))
+    }
+
     func testThatConformsToImageTypeIdentifiesCommonImageTypes() {
         // given
         let suts = ["public.jpeg",
