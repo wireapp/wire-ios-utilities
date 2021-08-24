@@ -57,6 +57,8 @@ extension UTType {
             return "video/mp4"
         case .quickTimeMovie:
             return "video/quicktime"
+        case .mpeg4Audio:
+            return "audio/mp4"
         default:
             return nil
         }
@@ -135,12 +137,16 @@ public final class UTIHelper: NSObject {
         
         return conformsToGifType(uti: uti)
     }
-    
+
     public class func conformsToAudioType(mime: String) -> Bool {
-        guard let uti = convertToUti(mime: mime) else { return false }
-        
+        guard let uti = convertToUti(mime: mime) else {
+            return false
+        }
         if #available(iOS 14, *) {
-            return conformsTo(uti: uti, type: .audio)
+            let audioTypes: [UTType] = [.audio, .mpeg4Audio]
+            return audioTypes.first(where: {
+                conformsTo(uti: uti, type: $0)
+            }) != nil
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeAudio)
         }
@@ -148,7 +154,7 @@ public final class UTIHelper: NSObject {
     
     public class func conformsToMovieType(mime: String) -> Bool {
         guard let uti = convertToUti(mime: mime) else {
-            return false            
+            return false
         }
         
         if #available(iOS 14, *) {
@@ -170,7 +176,7 @@ public final class UTIHelper: NSObject {
 
     #if targetEnvironment(simulator)
     @available(iOSApplicationExtension 14.0, *)
-    private static let utTypes: [UTType] = [.jpeg, .gif, .png, .json, .svg, .mpeg4Movie, .text, .quickTimeMovie]
+    private static let utTypes: [UTType] = [.jpeg, .gif, .png, .json, .svg, .mpeg4Movie, .text, .quickTimeMovie, .mpeg4Audio]
     #endif
     
     //MARK: - converters
