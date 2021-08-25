@@ -144,9 +144,9 @@ public final class UTIHelper: NSObject {
         }
         if #available(iOS 14, *) {
             let audioTypes: [UTType] = [.audio, .mpeg4Audio]
-            return audioTypes.first(where: {
+            return audioTypes.contains {
                 conformsTo(uti: uti, type: $0)
-            }) != nil
+            }
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeAudio)
         }
@@ -160,9 +160,9 @@ public final class UTIHelper: NSObject {
         if #available(iOS 14, *) {
             let movieTypes: [UTType] = [.movie, .mpeg4Movie, .quickTimeMovie]
             
-            return movieTypes.first(where: {
+            return movieTypes.contains {
                 conformsTo(uti: uti, type: $0)
-            }) != nil
+            }
         } else {
             return UTTypeConformsTo(uti as CFString, kUTTypeMovie)
         }
