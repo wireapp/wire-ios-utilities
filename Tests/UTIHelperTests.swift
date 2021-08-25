@@ -66,7 +66,7 @@ final class UTIHelperTests: XCTestCase {
 
         suts.forEach { sut in
             // when & then
-            XCTAssert(UTIHelper.conformsToAudioType(mime: sut), "\(sut) does not conforms to audio type")
+            XCTAssert(UTIHelper.conformsToAudioType(mime: sut), "\(sut) does not conform to audio type")
         }
     }
 
