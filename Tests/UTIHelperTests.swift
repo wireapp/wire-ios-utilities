@@ -79,7 +79,7 @@ final class UTIHelperTests: XCTestCase {
 
         suts.forEach { sut in
             // when & then
-            XCTAssert(UTIHelper.conformsToImageType(uti: sut), "\(sut) does not conforms to image type")
+            XCTAssert(UTIHelper.conformsToImageType(uti: sut), "\(sut) does not conform to image type")
         }
     }
 
